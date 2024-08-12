@@ -12,7 +12,7 @@ fi
 LAST_CHECK_TIMESTAMP=$(cat "$LAST_CHECK_FILE")
 
 grep "Failed password" "$LOG_FILE" | while read -r line; do
-    LOG_TIME=$(echo "$line" | awk '{print $1, $2, $3}') # Modify according to your log format
+    LOG_TIME=$(echo "$line" | awk '{print $1, $2, $3}') 
 
     LOG_TIMESTAMP=$(date -d "$LOG_TIME" +"%Y.%m.%d.%H:%M:%S")
 
