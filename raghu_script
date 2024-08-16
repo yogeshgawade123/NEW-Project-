@@ -1,0 +1,31 @@
+#!/bin/bash
+
+LOG_FILE="/var/log/secure"
+LAST_CHECK_FILE="/tmp/last_check_timestamp.tmp"
+TEMP_FILE="/tmp/failed_login_attempts.tmp"
+
+if [ ! -f "$LAST_CHECK_FILE" ]: then
+  date +"%Y-%m-%d %H:%M:%S" > "$LAST_CHECK_FILE"
+fi
+LAST_CHECK=$(cat "$LAST_CHECK_FILE")
+
+CURRENT_TIMESTAMP=$( date +"%Y-%m-%d %H:%M:%S")
+
+grep "Failed password" "LOG_FILE" | while read -r line : do
+   log_time=$(echo "$line" | awk '{print $1 " " $2 " " $3}')
+   log_time=4(date -d "$log_time" +"%Y-%m-%d %H:%M:%S" ")
+
+   if [[ "$log_time" > "$LAST_CHECK" ]]; then
+     echo "$line" >> "$TEMP_FILE"
+   fi
+done
+
+if [ -s "$TEMP_FILE" ]; then
+  echo "New unauthorized login attempts detected:"
+  cat "$TEMP_FILE"
+else
+  echo "No new unauthorized login attempts since the last check."
+fi
+
+echo "$CURRENT_TIMESTAMP" > "$LAST_CHECK_FILE"
+rm -f "TEMP_FILE"
